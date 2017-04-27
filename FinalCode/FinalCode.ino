@@ -1,25 +1,60 @@
-#define trigPin 10
-#define echoPin 13
+#include <EYW.h>
 #include <Servo.h>
+#include <Wire.h>
 
-Servo myservo;  // create servo object to control a servo
+/******************************* CREATE VARIABLES ********************************/
 
-int potpin = 0;  // analog pin used to connect the potentiometer
-int val;    // variable to read the value from the analog pin
+Servo myservo;           // create servo object to control the camera servo
+EYW::RangeFinder sonic;  // object used to read from the ultrasonic range finder
 
-void setup() {
+int buzzerP  = 0;        // pin used for the piezo speaker
+int buttonP  = 0;        // pin used to read from the button
+int ledP     = 0;        // pin used to control the led
+
+int angleMax = 90;       // maximum position for the servo to turn 
+int angleMin = 0;        // position for the serco to return to
+int degree   = angleMin; // variable used to store the position of the servo
+
+/******************************** CREATE METHODS *********************************/
+
+void init()              // set up all values for use in the program
+{
   Serial.begin (9600);
   pinMode(trigPin, OUTPUT);
   pinMode(echoPin, INPUT);
   myservo.attach(9);
-
-  val = analogRead(potpin);            
-  val = map(val, 0, 1023, 0, 180);   
-  myservo.write(val);     
-  delay(15);
+  
 }
 
-void loop() {
+void calibration()       // used for the 
+{
+  
+}
+
+void takePicture()       // turns the motor to the max then returns it to the min
+{
+  for(; val<=90; v++){
+    myservo.write();
+    delay(15);
+  }
+  delay(50);
+  for(; val>=0; v--){
+    myservo.write();
+    delay(15);
+  }
+}
+
+/****************************** DEFAULT RUN METHODS ******************************/
+
+void setup() 
+{
+
+  init();
+  
+}
+
+void loop() 
+{
     
   float distance = getDistance();
   
@@ -29,31 +64,16 @@ void loop() {
   }
   else if(distance >= 12 || distance <= 10) {
     val = 20;            
-    val = map(val, 0, 1023, 0, 180);   
     myservo.write(val);
   }
   else {
     Serial.print("Distance = ");
     Serial.print(distance);
     Serial.println(" cm");
-    val = analogRead(potpin);            
-    val = map(val, 0, 1023, 0, 180);   
+    val = 0;
     myservo.write(val);  
     delay(500);
   }
   delay(500);
-}
-
-float getDistance(){
-  float duration;
-  digitalWrite(trigPin, LOW); 
-  delayMicroseconds(2);
-       
-  digitalWrite(trigPin, HIGH);
-  delayMicroseconds(10);
-  digitalWrite(trigPin, LOW);
-        
-  duration = pulseIn(echoPin, HIGH);
-  return (duration / 2) * 0.0344;
 }
 
